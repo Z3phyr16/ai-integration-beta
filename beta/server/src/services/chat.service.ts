@@ -19,14 +19,19 @@ export const getConversations = async () => {
 };
 
 export const getMessages = async (conversationId: number) => {
-  return prisma.message.findMany({
-    where: {
-      conversationId,
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-  });
+  const [conversation, messages] = await Promise.all([
+    prisma.conversation.findUnique({
+      where: { id: conversationId },
+    }),
+    prisma.message.findMany({
+      where: { conversationId },
+      orderBy: { createdAt: "asc" },
+    }),
+  ]);
+  return {
+    title: conversation?.title,
+    messages,
+  };
 };
 
 export const sendMessage = async (conversationId: number, content: string) => {

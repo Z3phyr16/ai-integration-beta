@@ -42,9 +42,9 @@ export const getMessages = async (
   try {
     const conversationId = Number(req.params.conversationId);
 
-    const messages = await chatService.getMessages(conversationId);
+    const data = await chatService.getMessages(conversationId);
 
-    res.json(messages);
+    res.json(data);
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch messages",
