@@ -26,7 +26,9 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem>YAWTS</SidebarMenuItem>
+          <SidebarMenuItem className="flex justify-center">
+            YAWTS
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
@@ -34,7 +36,10 @@ export function AppSidebar() {
           <SidebarGroupLabel>Conversations</SidebarGroupLabel>
           <SidebarMenu>
             {conversations.map((convo) => (
-              <SidebarMenuItem key={convo.id}>
+              <SidebarMenuItem
+                key={convo.id}
+                className={convo.id === 1 ? "hidden" : ""} //remove this later on
+              >
                 <SidebarMenuButton>
                   <a href={`/c/${convo.id}`} className="w-100">
                     <TypingAnimation typeSpeed={typeSpeed}>

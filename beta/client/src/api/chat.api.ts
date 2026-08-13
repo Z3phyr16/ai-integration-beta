@@ -5,9 +5,10 @@ import type {
   SendMessageRequest,
   SendMessageResponse,
 } from "../types/chat.types"
-
+const currentHost = window.location.hostname
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || `http://${currentHost}:3000/`,
+  // baseURL: `http://${currentHost}:3000/`,
 })
 
 export const chatApi = {

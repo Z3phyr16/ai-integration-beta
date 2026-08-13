@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import ReactMarkdown from "react-markdown"
 import { IconFolderCode } from "@tabler/icons-react"
+import { TypingAnimation } from "@/components/ui/typing-animation"
 import {
   Empty,
   EmptyContent,
@@ -24,6 +25,7 @@ import { Marker, MarkerContent } from "@/components/ui/marker"
 import { useState } from "react"
 const ChatPage = () => {
   const { conversationId } = useParams()
+  const typeSpeed = 10
   const { title, loadingChat, loading, messages, sendMessage } = useChat(
     Number(conversationId) || 0
   )
@@ -37,7 +39,7 @@ const ChatPage = () => {
 
     await sendMessage(trimmed)
   }
-  if (Number(conversationId) === 0) {
+  if (!conversationId) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <Empty>
@@ -85,6 +87,9 @@ const ChatPage = () => {
                 align={message.role === "USER" ? "end" : "start"}
               >
                 <BubbleContent>
+                  {/* <TypingAnimation typeSpeed={typeSpeed}>
+                    {message.content}
+                  </TypingAnimation> */}
                   <ReactMarkdown>{message.content}</ReactMarkdown>
                 </BubbleContent>
               </Bubble>
