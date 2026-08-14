@@ -61,11 +61,20 @@ export const sendMessage = async (req: Request, res: Response) => {
       Number(conversationId),
       content,
     );
-
     res.json({
       response,
     });
-  } catch (error) {
-    res.status(500).json(error);
+  } catch (error: any) {
+    const message = error?.message ?? "Unknown error";
+
+    if (message.includes("429")) {
+      return res.status(429).json({
+        error: "Gemini rate limit exceeded. Please try again later.",
+      });
+    }
+
+    return res.status(500).json({
+      error: message,
+    });
   }
 };

@@ -7,8 +7,8 @@ import type {
 } from "../types/chat.types"
 const currentHost = window.location.hostname
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || `http://${currentHost}:3000/`,
-  // baseURL: `http://${currentHost}:3000/`,
+  // baseURL: import.meta.env.VITE_API_URL || `http://${currentHost}:3000/`,
+  baseURL: `http://${currentHost}:3000/`,
 })
 
 export const chatApi = {
@@ -34,7 +34,6 @@ export const chatApi = {
       `/api/chat/conversations/${conversationId}/messages`,
       data
     )
-
     return response.data
   },
 }

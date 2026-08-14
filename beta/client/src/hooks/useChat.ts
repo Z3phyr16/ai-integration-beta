@@ -21,7 +21,6 @@ export const useChat = (conversationId: number) => {
   const sendMessage = async (content: string) => {
     try {
       setLoadingChat(true)
-      console.log(content)
       const tempUserMessage: Message = {
         id: Date.now(),
         conversationId,

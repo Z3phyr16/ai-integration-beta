@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import ReactMarkdown from "react-markdown"
 import { IconFolderCode } from "@tabler/icons-react"
-import { TypingAnimation } from "@/components/ui/typing-animation"
 import {
   Empty,
   EmptyContent,
@@ -23,9 +22,11 @@ import {
 import { ArrowUpIcon } from "lucide-react"
 import { Marker, MarkerContent } from "@/components/ui/marker"
 import { useState } from "react"
+import remarkGfm from "remark-gfm"
+import rehypeHighlight from "rehype-highlight"
+import { CodeBlock } from "@/components/ui/code-block"
 const ChatPage = () => {
   const { conversationId } = useParams()
-  const typeSpeed = 10
   const { title, loadingChat, loading, messages, sendMessage } = useChat(
     Number(conversationId) || 0
   )
@@ -73,6 +74,47 @@ const ChatPage = () => {
       </div>
     )
   }
+  if (messages.length === 0) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="mx-auto flex w-full max-w-4xl flex-col">
+          <Empty>
+            <EmptyHeader>
+              <EmptyTitle>YAWTS</EmptyTitle>
+              <EmptyDescription>What's on your mind today?</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+          <div className="w-full py-4">
+            <div className="rounded-xl border bg-background shadow-lg">
+              <InputGroup>
+                <InputGroupTextarea
+                  placeholder="Send a message..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault()
+                      handleSend()
+                    }
+                  }}
+                />
+                <InputGroupAddon align="block-end">
+                  <InputGroupButton
+                    className="ml-auto"
+                    variant="default"
+                    onClick={handleSend}
+                  >
+                    <ArrowUpIcon />
+                    <span className="sr-only">Send</span>
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="flex h-full flex-col">
       <div className="mx-auto flex h-full w-full max-w-4xl flex-col">
@@ -83,14 +125,38 @@ const ChatPage = () => {
             {messages.map((message) => (
               <Bubble
                 key={message.id}
-                variant={message.role === "USER" ? "secondary" : "muted"}
+                variant={message.role === "USER" ? "secondary" : "ghost"}
                 align={message.role === "USER" ? "end" : "start"}
               >
-                <BubbleContent>
-                  {/* <TypingAnimation typeSpeed={typeSpeed}>
-                    {message.content}
-                  </TypingAnimation> */}
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                <BubbleContent className="max-w-none">
+                  <div className="prose max-w-none prose-neutral dark:prose-invert">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        code(props) {
+                          const { children, className } = props
+
+                          const match = /language-(\w+)/.exec(className || "")
+
+                          const language = match?.[1]
+
+                          const code = String(children).replace(/\n$/, "")
+
+                          if (language) {
+                            return <CodeBlock code={code} language={language} />
+                          }
+
+                          return (
+                            <code className="rounded bg-muted px-1 py-0.5">
+                              {children}
+                            </code>
+                          )
+                        },
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
                 </BubbleContent>
               </Bubble>
             ))}

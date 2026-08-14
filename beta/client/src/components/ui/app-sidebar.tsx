@@ -38,7 +38,7 @@ export function AppSidebar() {
             {conversations.map((convo) => (
               <SidebarMenuItem
                 key={convo.id}
-                className={convo.id === 1 ? "hidden" : ""} //remove this later on
+                // className={convo.id === 1 ? "hidden" : ""} //remove this later on
               >
                 <SidebarMenuButton>
                   <a href={`/c/${convo.id}`} className="w-100">
