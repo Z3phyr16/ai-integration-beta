@@ -18,9 +18,13 @@ export const useChat = (conversationId: number) => {
     }
   }
 
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (
+    content: string,
+    targetConversationId?: number
+  ) => {
     try {
       setLoadingChat(true)
+      const id = targetConversationId ?? conversationId
       const tempUserMessage: Message = {
         id: Date.now(),
         conversationId,
@@ -31,7 +35,7 @@ export const useChat = (conversationId: number) => {
 
       setMessages((prev) => [...prev, tempUserMessage])
 
-      const response = await chatApi.sendMessage(conversationId, {
+      const response = await chatApi.sendMessage(id, {
         content,
       })
 
@@ -62,6 +66,7 @@ export const useChat = (conversationId: number) => {
     messages,
     loading,
     loadingChat,
+    setLoading,
     sendMessage,
     reload: loadMessages,
   }

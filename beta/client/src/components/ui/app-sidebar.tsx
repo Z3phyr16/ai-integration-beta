@@ -9,31 +9,54 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import type { Conversation } from "../../types/chat.types"
 import { useConversation } from "@/hooks/useConversations"
 import { TypingAnimation } from "./typing-animation"
-import { useState } from "react"
-import ConversationModal from "./conversation-modal"
 import { useLocation, useNavigate } from "react-router-dom"
+import { Skeleton } from "@/components/ui/skeleton"
 
-export function AppSidebar() {
+type AppSidebarProps = {
+  conversationHook: ReturnType<typeof useConversation>
+}
+
+export function AppSidebar({ conversationHook }: AppSidebarProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const typeSpeed = 25
-  const conversationHook = useConversation()
-  const [open, setOpen] = useState(false)
-  const [selectedConversation, setSelectedConversation] =
-    useState<Conversation>({
-      id: 0,
-      title: "",
-      createdAt: "",
-    })
 
   if (conversationHook.isLoading) {
     return (
-      <div>
-        <p>Yawts is Loading...</p>
-      </div>
+      <Sidebar>
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem className="flex justify-center">
+              YAWTS
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <Skeleton className="h-4 w-20" />
+            <hr className="my-2" />
+            <SidebarMenu className="mb-4">
+              <SidebarMenuItem>
+                <Skeleton className="h-8 w-full" />
+              </SidebarMenuItem>
+            </SidebarMenu>
+            {conversationHook.conversations.length > 0 && (
+              <>
+                <Skeleton className="h-4 w-20" />
+                <hr className="my-2" />
+                <SidebarMenu>
+                  {conversationHook.conversations.map((convo) => {
+                    return <Skeleton className="h-8 w-full" key={convo.id} />
+                  })}
+                </SidebarMenu>
+              </>
+            )}
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter />
+      </Sidebar>
     )
   }
   return (
@@ -53,14 +76,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 className="cursor-pointer"
-                onClick={() => {
-                  setSelectedConversation({
-                    id: 0,
-                    title: "",
-                    createdAt: "",
-                  })
-                  setOpen(true)
-                }}
+                onClick={() => navigate("/c")}
               >
                 <TypingAnimation typeSpeed={typeSpeed}>
                   Create Conversation
@@ -96,13 +112,6 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter />
-      <ConversationModal
-        open={open}
-        onOpenChange={setOpen}
-        conversation={selectedConversation}
-        addConversation={conversationHook.addConversation}
-        reload={conversationHook.reload}
-      />
     </Sidebar>
   )
 }

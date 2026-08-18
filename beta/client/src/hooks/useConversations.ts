@@ -1,5 +1,5 @@
 import { chatApi } from "@/api/chat.api"
-import type { Conversation, ResponseType } from "@/types/chat.types"
+import type { Conversation } from "@/types/chat.types"
 import { useEffect, useState } from "react"
 
 export const useConversation = () => {
@@ -21,7 +21,13 @@ export const useConversation = () => {
   const addConversation = async (title: string) => {
     try {
       setIsLoading(true)
+
       const response = await chatApi.createConversation(title)
+
+      if (response.success) {
+        setConversations((prev) => [response.data, ...prev])
+      }
+
       return response
     } finally {
       setIsLoading(false)

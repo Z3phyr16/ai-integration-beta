@@ -39,7 +39,6 @@ export const chatApi = {
   },
 
   createConversation: async (title: string): Promise<ResponseType> => {
-    console.log(title)
     const response = await api.post<ResponseType>(`/api/chat/conversations`, {
       title,
     })

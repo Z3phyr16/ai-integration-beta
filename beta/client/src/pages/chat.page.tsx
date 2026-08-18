@@ -22,23 +22,16 @@ import { ArrowUpIcon } from "lucide-react"
 import { Marker, MarkerContent } from "@/components/ui/marker"
 import { useState } from "react"
 import { MessageList } from "@/components/ui/message-list"
-import type { Conversation } from "@/types/chat.types"
-import ConversationModal from "@/components/ui/conversation-modal"
-import { useConversation } from "@/hooks/useConversations"
+import { useConversationContext } from "@/components/ui/conversation-provider"
+import { useNavigate } from "react-router-dom"
 const ChatPage = () => {
+  const navigate = useNavigate()
   const { conversationId } = useParams()
-  const { title, loadingChat, loading, messages, sendMessage } = useChat(
-    Number(conversationId) || 0
-  )
+  const { title, loadingChat, loading, messages, setLoading, sendMessage } =
+    useChat(Number(conversationId) || 0)
 
-  const conversationHook = useConversation()
+  const conversationHook = useConversationContext()
   const [open, setOpen] = useState(false)
-  const [selectedConversation, setSelectedConversation] =
-    useState<Conversation>({
-      id: 0,
-      title: "",
-      createdAt: "",
-    })
 
   const [message, setMessage] = useState("")
   const handleSend = async () => {
@@ -46,44 +39,18 @@ const ChatPage = () => {
 
     if (!trimmed) return
     setMessage("")
-
-    await sendMessage(trimmed)
-  }
-  if (!conversationId) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <Empty>
-          <EmptyHeader>
-            <EmptyTitle>YAWTS</EmptyTitle>
-            <EmptyDescription>
-              Create conversation by clicking the button below
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent className="flex-row justify-center gap-2">
-            <Button
-              onClick={() => {
-                setSelectedConversation({
-                  id: 0,
-                  title: "",
-                  createdAt: "",
-                })
-                setOpen(true)
-              }}
-            >
-              Create Conversation
-            </Button>
-          </EmptyContent>
-        </Empty>
-
-        <ConversationModal
-          open={open}
-          onOpenChange={setOpen}
-          conversation={selectedConversation}
-          addConversation={conversationHook.addConversation}
-          reload={conversationHook.reload}
-        />
-      </div>
-    )
+    if (!conversationId) {
+      setLoading(true)
+      const response = await conversationHook.addConversation(trimmed)
+      if (response.success) {
+        const newId = response.data.id
+        navigate(`/c/${newId}`)
+        await sendMessage(trimmed, newId)
+      }
+      setLoading(false)
+    } else {
+      await sendMessage(trimmed)
+    }
   }
   if (loading) {
     return (
@@ -93,9 +60,67 @@ const ChatPage = () => {
             <EmptyMedia variant="icon">
               <Spinner />
             </EmptyMedia>
-            <EmptyTitle>Loading Conversation...</EmptyTitle>
+            <EmptyTitle>Creating Conversation</EmptyTitle>
           </EmptyHeader>
         </Empty>
+      </div>
+    )
+  }
+  if (!conversationId) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="mx-auto flex w-full max-w-4xl flex-col">
+          <Empty className="pb-2">
+            <EmptyHeader>
+              <EmptyTitle>YAWTS</EmptyTitle>
+              <EmptyDescription>
+                Start your legendary convo today
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+          <Bubble
+            className={loadingChat ? "" : "hidden"}
+            variant="muted"
+            align="start"
+          >
+            <BubbleContent className="flex items-center gap-2">
+              <Spinner />
+              <ReactMarkdown>Thinking...</ReactMarkdown>
+            </BubbleContent>
+          </Bubble>
+          <Marker variant="separator" className="mt-4">
+            <MarkerContent>
+              Nagkakamali si Yawts ah hinay hinay lang
+            </MarkerContent>
+          </Marker>
+          <div className="w-full py-4">
+            <div className="rounded-xl border bg-background shadow-lg">
+              <InputGroup>
+                <InputGroupTextarea
+                  placeholder="Send a message..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault()
+                      handleSend()
+                    }
+                  }}
+                />
+                <InputGroupAddon align="block-end">
+                  <InputGroupButton
+                    className="ml-auto"
+                    variant="default"
+                    onClick={handleSend}
+                  >
+                    <ArrowUpIcon />
+                    <span className="sr-only">Send</span>
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

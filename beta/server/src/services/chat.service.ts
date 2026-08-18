@@ -2,10 +2,23 @@ import prisma from "../prisma/client.js";
 import { MessageRole } from "@prisma/client";
 import { askGemini } from "./ai.service.js";
 
-export const createConversation = async (title?: string) => {
+export const createConversation = async (message?: string) => {
+  const aiResponse = await askGemini(`
+    Generate a short conversation title (3-6 words) based on this message.
+
+    Rules:
+    - Return ONLY the title
+    - No quotes
+    - No punctuation at the end
+    - Maximum 6 words
+
+    Message:
+    ${message}
+    `);
+
   return prisma.conversation.create({
     data: {
-      title: title || "No Title",
+      title: aiResponse?.trim() || message || "No Title",
     },
   });
 };
