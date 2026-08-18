@@ -10,11 +10,16 @@ export const createConversation = async (
 
     const conversation = await chatService.createConversation(title);
 
-    res.status(201).json(conversation);
+    res.status(201).json({
+      success: true,
+      message: "Conversation has been created successfully",
+      data: conversation,
+    });
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: "Failed to create conversation",
-      error,
+      data: error,
     });
   }
 };

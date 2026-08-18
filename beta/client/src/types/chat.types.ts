@@ -14,6 +14,12 @@ export interface SendMessageResponse {
   response: string
 }
 
+export interface ResponseType {
+  success: boolean
+  message: string
+  data: any
+}
+
 export interface Conversation {
   id: number
   title?: string

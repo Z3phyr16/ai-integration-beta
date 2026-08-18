@@ -4,7 +4,6 @@ import { Bubble, BubbleContent } from "@/components/ui/bubble"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import ReactMarkdown from "react-markdown"
-import { IconFolderCode } from "@tabler/icons-react"
 import {
   Empty,
   EmptyContent,
@@ -22,14 +21,24 @@ import {
 import { ArrowUpIcon } from "lucide-react"
 import { Marker, MarkerContent } from "@/components/ui/marker"
 import { useState } from "react"
-import remarkGfm from "remark-gfm"
-import rehypeHighlight from "rehype-highlight"
-import { CodeBlock } from "@/components/ui/code-block"
+import { MessageList } from "@/components/ui/message-list"
+import type { Conversation } from "@/types/chat.types"
+import ConversationModal from "@/components/ui/conversation-modal"
+import { useConversation } from "@/hooks/useConversations"
 const ChatPage = () => {
   const { conversationId } = useParams()
   const { title, loadingChat, loading, messages, sendMessage } = useChat(
     Number(conversationId) || 0
   )
+
+  const conversationHook = useConversation()
+  const [open, setOpen] = useState(false)
+  const [selectedConversation, setSelectedConversation] =
+    useState<Conversation>({
+      id: 0,
+      title: "",
+      createdAt: "",
+    })
 
   const [message, setMessage] = useState("")
   const handleSend = async () => {
@@ -45,18 +54,34 @@ const ChatPage = () => {
       <div className="flex h-full w-full items-center justify-center">
         <Empty>
           <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <IconFolderCode />
-            </EmptyMedia>
             <EmptyTitle>YAWTS</EmptyTitle>
             <EmptyDescription>
               Create conversation by clicking the button below
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center gap-2">
-            <Button>Create Conversation</Button>
+            <Button
+              onClick={() => {
+                setSelectedConversation({
+                  id: 0,
+                  title: "",
+                  createdAt: "",
+                })
+                setOpen(true)
+              }}
+            >
+              Create Conversation
+            </Button>
           </EmptyContent>
         </Empty>
+
+        <ConversationModal
+          open={open}
+          onOpenChange={setOpen}
+          conversation={selectedConversation}
+          addConversation={conversationHook.addConversation}
+          reload={conversationHook.reload}
+        />
       </div>
     )
   }
@@ -78,12 +103,19 @@ const ChatPage = () => {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <div className="mx-auto flex w-full max-w-4xl flex-col">
-          <Empty>
+          <Empty className="pb-2">
             <EmptyHeader>
               <EmptyTitle>YAWTS</EmptyTitle>
-              <EmptyDescription>What's on your mind today?</EmptyDescription>
+              <EmptyDescription>
+                Start your legendary convo today
+              </EmptyDescription>
             </EmptyHeader>
           </Empty>
+          <Marker variant="separator" className="mt-4">
+            <MarkerContent>
+              Nagkakamali si Yawts ah hinay hinay lang
+            </MarkerContent>
+          </Marker>
           <div className="w-full py-4">
             <div className="rounded-xl border bg-background shadow-lg">
               <InputGroup>
@@ -118,48 +150,10 @@ const ChatPage = () => {
   return (
     <div className="flex h-full flex-col">
       <div className="mx-auto flex h-full w-full max-w-4xl flex-col">
-        <h1 className="text-[24px]">{title}</h1>
-
+        {/* <h1 className="text-[24px]">{title}</h1> */}
         <div className="flex-1 overflow-y-auto py-12">
           <div className="flex flex-col gap-12">
-            {messages.map((message) => (
-              <Bubble
-                key={message.id}
-                variant={message.role === "USER" ? "secondary" : "ghost"}
-                align={message.role === "USER" ? "end" : "start"}
-              >
-                <BubbleContent className="max-w-none">
-                  <div className="prose max-w-none prose-neutral dark:prose-invert">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={{
-                        code(props) {
-                          const { children, className } = props
-
-                          const match = /language-(\w+)/.exec(className || "")
-
-                          const language = match?.[1]
-
-                          const code = String(children).replace(/\n$/, "")
-
-                          if (language) {
-                            return <CodeBlock code={code} language={language} />
-                          }
-
-                          return (
-                            <code className="rounded bg-muted px-1 py-0.5">
-                              {children}
-                            </code>
-                          )
-                        },
-                      }}
-                    >
-                      {message.content}
-                    </ReactMarkdown>
-                  </div>
-                </BubbleContent>
-              </Bubble>
-            ))}
+            <MessageList messages={messages} />
 
             <Bubble
               className={loadingChat ? "" : "hidden"}

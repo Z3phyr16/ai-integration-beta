@@ -2,6 +2,7 @@ import axios from "axios"
 import type {
   ConversationResponse,
   Conversation,
+  ResponseType,
   SendMessageRequest,
   SendMessageResponse,
 } from "../types/chat.types"
@@ -34,6 +35,14 @@ export const chatApi = {
       `/api/chat/conversations/${conversationId}/messages`,
       data
     )
+    return response.data
+  },
+
+  createConversation: async (title: string): Promise<ResponseType> => {
+    console.log(title)
+    const response = await api.post<ResponseType>(`/api/chat/conversations`, {
+      title,
+    })
     return response.data
   },
 }
