@@ -35,7 +35,6 @@ const ConversationItem = React.memo(function ConversationItem({
   onRename: (conversation: Conversation) => void
   typeSpeed: number
 }) {
-  console.log("Rendering:", conversation.id, conversation.title)
   const navigate = useNavigate()
   const location = useLocation()
 
