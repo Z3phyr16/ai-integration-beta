@@ -44,4 +44,16 @@ export const chatApi = {
     })
     return response.data
   },
+
+  renameConversation: async (
+    conversation: Conversation
+  ): Promise<ResponseType> => {
+    const response = await api.patch<ResponseType>(
+      `/api/chat/conversations/${conversation.id}`,
+      {
+        title: conversation.title,
+      }
+    )
+    return response.data
+  },
 }

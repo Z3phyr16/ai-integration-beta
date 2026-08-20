@@ -1,5 +1,5 @@
 import prisma from "../prisma/client.js";
-import { MessageRole } from "@prisma/client";
+import { MessageRole, type Conversation } from "@prisma/client";
 import { askGemini } from "./ai.service.js";
 
 export const createConversation = async (message?: string) => {
@@ -19,6 +19,20 @@ export const createConversation = async (message?: string) => {
   return prisma.conversation.create({
     data: {
       title: aiResponse?.trim() || message || "No Title",
+    },
+  });
+};
+
+export const renameConversation = async (
+  conversationId: number,
+  title: string,
+) => {
+  return await prisma.conversation.update({
+    where: {
+      id: conversationId,
+    },
+    data: {
+      title,
     },
   });
 };

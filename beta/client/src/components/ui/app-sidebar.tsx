@@ -11,8 +11,11 @@ import {
 } from "@/components/ui/sidebar"
 import { useConversation } from "@/hooks/useConversations"
 import { TypingAnimation } from "./typing-animation"
-import { useLocation, useNavigate } from "react-router-dom"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useNavigate } from "react-router-dom"
+import ConversationModal from "./conversation-modal"
+import type { Conversation } from "@/types/chat.types"
+import { useState, useCallback } from "react"
+import { ConversationList } from "./conversation-list"
 
 type AppSidebarProps = {
   conversationHook: ReturnType<typeof useConversation>
@@ -20,45 +23,18 @@ type AppSidebarProps = {
 
 export function AppSidebar({ conversationHook }: AppSidebarProps) {
   const navigate = useNavigate()
-  const location = useLocation()
   const typeSpeed = 25
+  const [selectedConvo, setSelectedConvo] = useState<Conversation>({
+    id: 0,
+    title: "",
+    createdAt: "",
+  })
+  const [modalOpen, setModalOpen] = useState(false)
+  const handleRenameClick = useCallback((convo: Conversation) => {
+    setSelectedConvo(convo)
+    setModalOpen(true)
+  }, [])
 
-  if (conversationHook.isLoading) {
-    return (
-      <Sidebar>
-        <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem className="flex justify-center">
-              YAWTS
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <Skeleton className="h-4 w-20" />
-            <hr className="my-2" />
-            <SidebarMenu className="mb-4">
-              <SidebarMenuItem>
-                <Skeleton className="h-8 w-full" />
-              </SidebarMenuItem>
-            </SidebarMenu>
-            {conversationHook.conversations.length > 0 && (
-              <>
-                <Skeleton className="h-4 w-20" />
-                <hr className="my-2" />
-                <SidebarMenu>
-                  {conversationHook.conversations.map((convo) => {
-                    return <Skeleton className="h-8 w-full" key={convo.id} />
-                  })}
-                </SidebarMenu>
-              </>
-            )}
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarFooter />
-      </Sidebar>
-    )
-  }
   return (
     <Sidebar>
       <SidebarHeader>
@@ -88,26 +64,20 @@ export function AppSidebar({ conversationHook }: AppSidebarProps) {
             <>
               <SidebarGroupLabel>Conversations</SidebarGroupLabel>
               <hr />
-              <SidebarMenu>
-                {conversationHook.conversations.map((convo) => {
-                  const isActive = location.pathname === `/c/${convo.id}`
-
-                  return (
-                    <SidebarMenuItem key={convo.id}>
-                      <SidebarMenuButton
-                        isActive={isActive}
-                        className="cursor-pointer"
-                        onClick={() => navigate(`/c/${convo.id}`)}
-                      >
-                        <TypingAnimation typeSpeed={typeSpeed}>
-                          {convo.title}
-                        </TypingAnimation>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )
-                })}
-              </SidebarMenu>
+              <ConversationList
+                conversations={conversationHook.conversations}
+                onRename={handleRenameClick}
+                typeSpeed={typeSpeed}
+              />
             </>
+          )}
+          {selectedConvo && (
+            <ConversationModal
+              open={modalOpen}
+              onOpenChange={setModalOpen}
+              conversation={selectedConvo}
+              conversationHook={conversationHook}
+            />
           )}
         </SidebarGroup>
       </SidebarContent>

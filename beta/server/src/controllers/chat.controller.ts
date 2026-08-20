@@ -24,6 +24,28 @@ export const createConversation = async (
   }
 };
 
+export const renameConvo = async (req: Request, res: Response) => {
+  try {
+    const { title } = req.body;
+    const conversationId = Number(req.params.conversationId);
+    const conversation = await chatService.renameConversation(
+      conversationId,
+      title,
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Conversation has been renamed successfully",
+      data: conversation,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch conversations",
+      error,
+    });
+  }
+};
+
 export const getConversations = async (
   req: Request,
   res: Response,

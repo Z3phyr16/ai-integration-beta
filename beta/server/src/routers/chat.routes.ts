@@ -5,6 +5,8 @@ const router = Router();
 
 router.post("/conversations", chatController.createConversation);
 
+router.patch("/conversations/:conversationId", chatController.renameConvo);
+
 router.get("/conversations", chatController.getConversations);
 
 router.get(

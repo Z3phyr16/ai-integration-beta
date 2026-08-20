@@ -34,6 +34,26 @@ export const useConversation = () => {
     }
   }
 
+  const renameConvo = async (conversation: Conversation) => {
+    try {
+      setIsLoading(true)
+      const response = await chatApi.renameConversation(conversation)
+
+      if (response.success) {
+        setConversations((prevList) =>
+          prevList.map((convo) =>
+            convo.id === conversation.id
+              ? { ...convo, title: response.data.title }
+              : convo
+          )
+        )
+      }
+      return response
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     loadConversations()
   }, [])
@@ -42,6 +62,7 @@ export const useConversation = () => {
     isLoading,
     conversations,
     addConversation,
+    renameConvo,
     reload: loadConversations,
   }
 }

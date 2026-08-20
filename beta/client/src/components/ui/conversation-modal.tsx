@@ -9,30 +9,25 @@ import { Button } from "./button"
 import { Input } from "./input"
 import type { Conversation } from "@/types/chat.types"
 import { useEffect, useState } from "react"
-import { toast } from "@/components/ui/toast"
-import type { ResponseType } from "@/types/chat.types"
-import { useNavigate } from "react-router-dom"
+import { useConversation } from "@/hooks/useConversations"
 
 type ConversationModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   conversation: Conversation
-  addConversation: (title: string) => Promise<ResponseType>
-  reload: () => Promise<void>
+  conversationHook: ReturnType<typeof useConversation>
 }
 export default function ConversationModal({
   open,
   onOpenChange,
   conversation,
-  addConversation,
-  reload,
+  conversationHook,
 }: ConversationModalProps) {
   const [convo, setConvo] = useState<Conversation>({
     id: 0,
     title: "",
     createdAt: "",
   })
-  const navigate = useNavigate()
   useEffect(() => {
     if (conversation.id > 0) {
       setConvo(conversation)
@@ -46,28 +41,20 @@ export default function ConversationModal({
   }, [conversation, open])
 
   const handleSubmit = async () => {
-    if (!convo?.title?.trim()) {
-      return
-    }
-    const response = await addConversation(convo.title!)
+    if (!convo.title) return
+    const response = await conversationHook.renameConvo(convo)
     if (response.success) {
-      await reload()
+      console.log(response.message)
       onOpenChange(false)
-      navigate(`/c/${response.data.id}`)
     }
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {convo.id === 0 ? "Create Conversation" : "Rename Conversation"}
-          </DialogTitle>
-
+          <DialogTitle>Rename Conversation</DialogTitle>
           <DialogDescription>
-            {convo.id === 0
-              ? "Create a new conversation."
-              : "Update the conversation title."}
+            Rename your legendary conversation with yawts!
           </DialogDescription>
         </DialogHeader>
         <form
@@ -87,9 +74,7 @@ export default function ConversationModal({
             placeholder="Enter Conversation Title"
           />
         </form>
-        <Button onClick={handleSubmit}>
-          {convo.id === 0 ? "Create" : "Save Changes"}
-        </Button>
+        <Button onClick={handleSubmit}>Save Changes</Button>
       </DialogContent>
     </Dialog>
   )
