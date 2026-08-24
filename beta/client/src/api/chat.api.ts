@@ -56,4 +56,11 @@ export const chatApi = {
     )
     return response.data
   },
+
+  deleteConversation: async (conversationId: number): Promise<ResponseType> => {
+    const response = await api.delete<ResponseType>(
+      `/api/chat/conversations/${conversationId}`
+    )
+    return response.data
+  },
 }

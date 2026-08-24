@@ -29,8 +29,15 @@ export function AppSidebar({ conversationHook }: AppSidebarProps) {
     title: "",
     createdAt: "",
   })
+  const [mode, setMode] = useState("rename")
   const [modalOpen, setModalOpen] = useState(false)
   const handleRenameClick = useCallback((convo: Conversation) => {
+    setMode("rename")
+    setSelectedConvo(convo)
+    setModalOpen(true)
+  }, [])
+  const handleDeleteClick = useCallback((convo: Conversation) => {
+    setMode("delete")
     setSelectedConvo(convo)
     setModalOpen(true)
   }, [])
@@ -66,6 +73,7 @@ export function AppSidebar({ conversationHook }: AppSidebarProps) {
               <hr />
               <ConversationList
                 conversations={conversationHook.conversations}
+                onDelete={handleDeleteClick}
                 onRename={handleRenameClick}
                 typeSpeed={typeSpeed}
               />
@@ -75,6 +83,7 @@ export function AppSidebar({ conversationHook }: AppSidebarProps) {
             <ConversationModal
               open={modalOpen}
               onOpenChange={setModalOpen}
+              mode={mode}
               conversation={selectedConvo}
               conversationHook={conversationHook}
             />

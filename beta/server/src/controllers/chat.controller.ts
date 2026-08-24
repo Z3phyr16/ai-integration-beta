@@ -105,3 +105,24 @@ export const sendMessage = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const deleteConvo = async (req: Request, res: Response) => {
+  try {
+    const conversationId = Number(req.params.id);
+
+    const deleteResponse = await chatService.deleteConversation(conversationId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Conversation has been deleted successfully",
+      data: deleteResponse,
+    });
+  } catch (error) {
+    console.error("DELETE CONVERSATION ERROR", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Something went wrong",
+    });
+  }
+};

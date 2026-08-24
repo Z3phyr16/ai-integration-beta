@@ -1,6 +1,7 @@
 import express from "express";
 import chatRoutes from "./routers/chat.routes.js";
 import cors from "cors";
+import visionRoute from "./routers/vision.routes.js";
 
 const app = express();
 
@@ -13,5 +14,6 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/chat", chatRoutes);
+app.use("/api/vision", visionRoute);
 
 export default app;

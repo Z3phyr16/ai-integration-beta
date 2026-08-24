@@ -16,23 +16,26 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-import { EllipsisVertical, Pencil } from "lucide-react"
+import { Trash, EllipsisVertical, Pencil } from "lucide-react"
 import { TypingAnimation } from "./typing-animation"
 import type { Conversation } from "@/types/chat.types"
 
 type ConversationListProps = {
   conversations: Conversation[]
   onRename: (conversation: Conversation) => void
+  onDelete: (Conversation: Conversation) => void
   typeSpeed?: number
 }
 
 const ConversationItem = React.memo(function ConversationItem({
   conversation,
   onRename,
+  onDelete,
   typeSpeed,
 }: {
   conversation: Conversation
   onRename: (conversation: Conversation) => void
+  onDelete: (conversation: Conversation) => void
   typeSpeed: number
 }) {
   const navigate = useNavigate()
@@ -62,13 +65,20 @@ const ConversationItem = React.memo(function ConversationItem({
           </PopoverTrigger>
 
           <PopoverContent align="center" side="right" className="w-48 p-2">
-            <PopoverHeader>
+            <PopoverHeader className="gap-2">
               <PopoverTitle
                 className="flex cursor-pointer items-center gap-2"
                 onClick={() => onRename(conversation)}
               >
                 <Pencil className="h-4 w-9" />
                 <span className="w-100">Rename</span>
+              </PopoverTitle>
+              <PopoverTitle
+                className="flex cursor-pointer items-center gap-2"
+                onClick={() => onDelete(conversation)}
+              >
+                <Trash className="h-4 w-9 text-red-500" />
+                <span className="w-100 text-red-500">Delete</span>
               </PopoverTitle>
             </PopoverHeader>
           </PopoverContent>
@@ -81,6 +91,7 @@ const ConversationItem = React.memo(function ConversationItem({
 export const ConversationList = React.memo(function ConversationList({
   conversations,
   onRename,
+  onDelete,
   typeSpeed = 25,
 }: ConversationListProps) {
   return (
@@ -90,6 +101,7 @@ export const ConversationList = React.memo(function ConversationList({
           key={conversation.id}
           conversation={conversation}
           onRename={onRename}
+          onDelete={onDelete}
           typeSpeed={typeSpeed}
         />
       ))}

@@ -1,8 +1,10 @@
 import { chatApi } from "@/api/chat.api"
 import type { Conversation } from "@/types/chat.types"
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export const useConversation = () => {
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [conversations, setConversations] = useState<Conversation[]>([])
 
@@ -54,6 +56,20 @@ export const useConversation = () => {
     }
   }
 
+  const deleteConvo = async (conversationId: number) => {
+    try {
+      setIsLoading(true)
+      const response = await chatApi.deleteConversation(conversationId)
+      if (response.success) {
+        setConversations((prev) => prev.filter((c) => c.id !== conversationId))
+        navigate("/c")
+      }
+      return response
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     loadConversations()
   }, [])
@@ -61,6 +77,7 @@ export const useConversation = () => {
   return {
     isLoading,
     conversations,
+    deleteConvo,
     addConversation,
     renameConvo,
     reload: loadConversations,

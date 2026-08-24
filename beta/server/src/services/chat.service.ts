@@ -56,7 +56,7 @@ export const getMessages = async (conversationId: number) => {
     }),
   ]);
   return {
-    title: conversation?.title,
+    conversation: conversation,
     messages,
   };
 };
@@ -94,4 +94,24 @@ export const sendMessage = async (conversationId: number, content: string) => {
   });
 
   return aiResponse;
+};
+
+export const deleteConversation = async (id: number) => {
+  const conversation = await prisma.conversation.findUnique({
+    where: { id },
+  });
+
+  if (!conversation) {
+    throw new Error("Conversation not found");
+  }
+
+  await prisma.message.deleteMany({
+    where: {
+      conversationId: id,
+    },
+  });
+
+  return prisma.conversation.delete({
+    where: { id },
+  });
 };

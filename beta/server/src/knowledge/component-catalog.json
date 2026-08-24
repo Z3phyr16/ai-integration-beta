@@ -1,0 +1,14 @@
+[
+  {
+    "name": "CustomInput",
+    "category": "input",
+    "description": "Single line text input",
+    "example": "<CustomInput @bind-Value=\"Model.FirstName\" Label=\"First Name\" Placeholder=\"Enter First Name\"/>"
+  },
+  {
+    "name": "AtomComboBox",
+    "category": "dropdown",
+    "description": "Dropdown selection",
+    "example": "<AtomComboBox Data=\"@DocumentClassificationList\" Value=\"SelectedDocumentClassification\" ValueChanged=\"(DocumentClassification item) => HandleSelectedDocumentClassificationChanged(item)\" TextExpression=\"@((DocumentClassification item) => item.ClassificationName)\" Placeholder=\"Select Document Classification\" EnableClear=\"true\"  />"
+  }
+]

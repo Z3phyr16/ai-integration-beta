@@ -19,4 +19,6 @@ router.post(
   chatController.sendMessage,
 );
 
+router.delete("/conversations/:id", chatController.deleteConvo);
+
 export default router;

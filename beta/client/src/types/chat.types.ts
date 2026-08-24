@@ -27,6 +27,6 @@ export interface Conversation {
 }
 
 export interface ConversationResponse {
-  title: string
+  conversation: Conversation
   messages: Message[]
 }
