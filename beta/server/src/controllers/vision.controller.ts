@@ -1,5 +1,7 @@
 import type { Request, Response } from "express";
 import * as visionService from "../services/vision.service.js";
+import { mapControlsToComponents } from "../services/component-mapper.service.js";
+import { generateRazor } from "../services/razor-generator.service.js";
 import fs from "fs/promises";
 
 export const analyzeImage = async (req: Request, res: Response) => {
@@ -15,14 +17,34 @@ export const analyzeImage = async (req: Request, res: Response) => {
 
     const base64 = buffer.toString("base64");
 
-    const result = await visionService.analyzeUiImage(
-      base64,
-      req.file.mimetype,
-    );
+    const extension = req.file.originalname.split(".").pop()?.toLowerCase();
 
-    return res.status(200).json({
+    let mimeType = "image/png";
+
+    switch (extension) {
+      case "jpg":
+      case "jpeg":
+        mimeType = "image/jpeg";
+        break;
+
+      case "png":
+        mimeType = "image/png";
+        break;
+
+      case "webp":
+        mimeType = "image/webp";
+        break;
+    }
+
+    const detected = await visionService.analyzeUiImage(base64, mimeType);
+
+    const mapped = mapControlsToComponents(detected);
+
+    const razor = generateRazor(mapped);
+
+    return res.json({
       success: true,
-      data: result,
+      razor,
     });
   } catch (error) {
     console.error(error);

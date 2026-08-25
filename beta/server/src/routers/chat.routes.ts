@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as chatController from "../controllers/chat.controller.js";
+import upload from "../middleware/upload.middleware.js";
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.get(
 
 router.post(
   "/conversations/:conversationId/messages",
+  upload.single("image"),
   chatController.sendMessage,
 );
 

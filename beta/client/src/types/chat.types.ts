@@ -8,6 +8,7 @@ export interface Message {
 
 export interface SendMessageRequest {
   content: string
+  image?: File | null
 }
 
 export interface SendMessageResponse {

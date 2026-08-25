@@ -1,5 +1,9 @@
 import type { Request, Response } from "express";
 import * as chatService from "../services/chat.service.js";
+import * as visionService from "../services/vision.service.js";
+import { mapControlsToComponents } from "../services/component-mapper.service.js";
+import { generateRazor } from "../services/razor-generator.service.js";
+import fs from "fs/promises";
 
 export const createConversation = async (
   req: Request,
@@ -82,11 +86,45 @@ export const getMessages = async (
 
 export const sendMessage = async (req: Request, res: Response) => {
   try {
-    const { conversationId } = req.params;
-    const { content } = req.body;
+    const conversationId = Number(req.params.conversationId);
+    const content = req.body.content;
+    let imageAnalysis = "";
+    if (req.file) {
+      const buffer = await fs.readFile(req.file.path);
+
+      const base64 = buffer.toString("base64");
+
+      const extension = req.file.originalname.split(".").pop()?.toLowerCase();
+
+      let mimeType = "image/png";
+
+      switch (extension) {
+        case "jpg":
+        case "jpeg":
+          mimeType = "image/jpeg";
+          break;
+
+        case "png":
+          mimeType = "image/png";
+          break;
+
+        case "webp":
+          mimeType = "image/webp";
+          break;
+      }
+
+      const detected = await visionService.analyzeUiImage(base64, mimeType);
+
+      const mapped = mapControlsToComponents(detected);
+
+      const razor = generateRazor(mapped);
+      imageAnalysis = razor;
+    }
+
     const response = await chatService.sendMessage(
       Number(conversationId),
       content,
+      imageAnalysis,
     );
     res.json({
       response,

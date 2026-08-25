@@ -26,7 +26,8 @@ export const useChat = (conversationId: number) => {
 
   const sendMessage = async (
     content: string,
-    targetConversationId?: number
+    targetConversationId?: number,
+    image?: File
   ) => {
     try {
       setLoadingChat(true)
@@ -43,6 +44,7 @@ export const useChat = (conversationId: number) => {
 
       const response = await chatApi.sendMessage(id, {
         content,
+        image: image || null,
       })
 
       const aiMessage: Message = {

@@ -61,7 +61,11 @@ export const getMessages = async (conversationId: number) => {
   };
 };
 
-export const sendMessage = async (conversationId: number, content: string) => {
+export const sendMessage = async (
+  conversationId: number,
+  content: string,
+  imageAnalysis: string,
+) => {
   await prisma.message.create({
     data: {
       conversationId,

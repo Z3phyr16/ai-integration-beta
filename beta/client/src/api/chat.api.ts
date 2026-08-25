@@ -31,9 +31,14 @@ export const chatApi = {
     conversationId: number,
     data: SendMessageRequest
   ): Promise<SendMessageResponse> => {
+    const formData = new FormData()
+    formData.append("content", data.content)
+    if (data.image) {
+      formData.append("image", data.image)
+    }
     const response = await api.post<SendMessageResponse>(
       `/api/chat/conversations/${conversationId}/messages`,
-      data
+      formData
     )
     return response.data
   },

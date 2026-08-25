@@ -32,6 +32,7 @@ const ChatPage = () => {
 
   const conversationHook = useConversationContext()
   const [open, setOpen] = useState(false)
+  const [image, setImage] = useState<File | null>(null)
 
   const [message, setMessage] = useState("")
   const handleSend = async () => {
@@ -50,6 +51,19 @@ const ChatPage = () => {
       setLoading(false)
     } else {
       await sendMessage(trimmed)
+    }
+  }
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items
+
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        const file = item.getAsFile()
+
+        if (file) {
+          setImage(file)
+        }
+      }
     }
   }
   if (loading) {
@@ -201,6 +215,7 @@ const ChatPage = () => {
           <div className="rounded-xl border bg-background shadow-lg">
             <InputGroup>
               <InputGroupTextarea
+                onPaste={handlePaste}
                 placeholder="Send a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
