@@ -31,26 +31,48 @@ const markdownComponents = {
 export const MessageList = React.memo(function MessageList({
   messages,
 }: MessageListProps) {
+  const API_URL = import.meta.env.VITE_API_URL
+
   return (
     <>
-      {messages.map((message) => (
-        <Bubble
-          key={message.id}
-          variant={message.role === "USER" ? "secondary" : "ghost"}
-          align={message.role === "USER" ? "end" : "start"}
-        >
-          <BubbleContent className="max-w-none">
-            <div className="prose max-w-none prose-neutral dark:prose-invert">
+      {messages.map((message) => {
+        const renderedContent =
+          message.contentType === "razor"
+            ? `\`\`\`razor
+${message.content}
+\`\`\``
+            : message.content
+
+        return (
+          <Bubble
+            key={message.id}
+            variant={message.role === "USER" ? "secondary" : "ghost"}
+            align={message.role === "USER" ? "end" : "start"}
+          >
+            <BubbleContent
+              className={
+                message.role === "USER" ? "max-w-[450px]" : "max-w-none"
+              }
+            >
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={markdownComponents}
               >
-                {message.content}
+                {renderedContent}
               </ReactMarkdown>
-            </div>
-          </BubbleContent>
-        </Bubble>
-      ))}
+
+              {message.imagePath && (
+                <img
+                  src={`${API_URL}uploads/${message.imagePath}`}
+                  alt="Uploaded"
+                  loading="lazy"
+                  className="mb-2 max-w-sm rounded-lg border"
+                />
+              )}
+            </BubbleContent>
+          </Bubble>
+        )
+      })}
     </>
   )
 })

@@ -1,12 +1,10 @@
 import { useChat } from "@/hooks/useChat"
 import { useParams } from "react-router-dom"
 import { Bubble, BubbleContent } from "@/components/ui/bubble"
-import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import ReactMarkdown from "react-markdown"
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -31,7 +29,6 @@ const ChatPage = () => {
     useChat(Number(conversationId) || 0)
 
   const conversationHook = useConversationContext()
-  const [open, setOpen] = useState(false)
   const [image, setImage] = useState<File | null>(null)
 
   const [message, setMessage] = useState("")
@@ -40,26 +37,25 @@ const ChatPage = () => {
 
     if (!trimmed) return
     setMessage("")
+    setImage(null)
     if (!conversationId) {
       setLoading(true)
       const response = await conversationHook.addConversation(trimmed)
       if (response.success) {
         const newId = response.data.id
         navigate(`/c/${newId}`)
-        await sendMessage(trimmed, newId)
+        await sendMessage(trimmed, newId, image ?? undefined)
       }
       setLoading(false)
     } else {
-      await sendMessage(trimmed)
+      await sendMessage(trimmed, undefined, image ?? undefined)
     }
   }
   const handlePaste = (e: React.ClipboardEvent) => {
     const items = e.clipboardData.items
-
     for (const item of items) {
       if (item.type.startsWith("image/")) {
         const file = item.getAsFile()
-
         if (file) {
           setImage(file)
         }
@@ -108,9 +104,17 @@ const ChatPage = () => {
             </MarkerContent>
           </Marker>
           <div className="w-full py-4">
+            {image && (
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Preview"
+                className="mb-2 h-16 w-16 rounded-lg border object-cover"
+              />
+            )}
             <div className="rounded-xl border bg-background shadow-lg">
               <InputGroup>
                 <InputGroupTextarea
+                  onPaste={handlePaste}
                   placeholder="Send a message..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -156,9 +160,17 @@ const ChatPage = () => {
             </MarkerContent>
           </Marker>
           <div className="w-full py-4">
+            {image && (
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Preview"
+                className="mb-2 h-16 w-16 rounded-lg border object-cover"
+              />
+            )}
             <div className="rounded-xl border bg-background shadow-lg">
               <InputGroup>
                 <InputGroupTextarea
+                  onPaste={handlePaste}
                   placeholder="Send a message..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -212,6 +224,13 @@ const ChatPage = () => {
           </MarkerContent>
         </Marker>
         <div className="sticky bottom-0 py-4">
+          {image && (
+            <img
+              src={URL.createObjectURL(image)}
+              alt="Preview"
+              className="mb-2 h-16 w-16 rounded-lg border object-cover"
+            />
+          )}
           <div className="rounded-xl border bg-background shadow-lg">
             <InputGroup>
               <InputGroupTextarea

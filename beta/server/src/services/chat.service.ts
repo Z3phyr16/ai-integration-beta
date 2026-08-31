@@ -65,14 +65,30 @@ export const sendMessage = async (
   conversationId: number,
   content: string,
   imageAnalysis: string,
+  imagePath: string,
 ) => {
   await prisma.message.create({
     data: {
       conversationId,
       role: "USER",
       content,
+      imagePath,
+      contentType: "text",
     },
   });
+
+  if (imageAnalysis) {
+    await prisma.message.create({
+      data: {
+        conversationId,
+        role: "ASSISTANT",
+        content: imageAnalysis,
+        contentType: "razor",
+      },
+    });
+
+    return imageAnalysis;
+  }
 
   const messages = await prisma.message.findMany({
     where: {
@@ -94,6 +110,7 @@ export const sendMessage = async (
       conversationId,
       role: "ASSISTANT",
       content: aiResponse || "",
+      contentType: "text",
     },
   });
 

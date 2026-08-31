@@ -3,6 +3,8 @@ export interface Message {
   conversationId: number
   role: "USER" | "ASSISTANT"
   content: string
+  contentType?: string
+  imagePath?: string | null
   createdAt: string
 }
 
@@ -12,7 +14,8 @@ export interface SendMessageRequest {
 }
 
 export interface SendMessageResponse {
-  response: string
+  content: string
+  contentType: string
 }
 
 export interface ResponseType {

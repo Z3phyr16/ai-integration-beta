@@ -37,6 +37,7 @@ export const useChat = (conversationId: number) => {
         conversationId,
         role: "USER",
         content,
+        contentType: "text",
         createdAt: new Date().toISOString(),
       }
 
@@ -51,7 +52,8 @@ export const useChat = (conversationId: number) => {
         id: Date.now() + 1,
         conversationId,
         role: "ASSISTANT",
-        content: response.response,
+        content: response.content,
+        contentType: response.contentType,
         createdAt: new Date().toISOString(),
       }
 

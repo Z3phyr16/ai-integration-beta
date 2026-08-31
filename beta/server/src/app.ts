@@ -15,5 +15,6 @@ app.use(cors());
 
 app.use("/api/chat", chatRoutes);
 app.use("/api/vision", visionRoute);
+app.use("/uploads", express.static("uploads"));
 
 export default app;

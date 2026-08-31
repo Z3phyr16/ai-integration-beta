@@ -11,25 +11,40 @@ datasource db {
   provider = "postgresql"
 }
 
-model Conversation{
-  id Int @id @default(autoincrement())
-  title String?
+model Conversation {
+  id        Int      @id @default(autoincrement())
+  title     String?
   createdAt DateTime @default(now())
 
   message Message[]
 }
 
-model Message{
-  id Int @id @default(autoincrement())
+model Message {
+  id             Int         @id @default(autoincrement())
   conversationId Int
-  role MessageRole
-  content String @db.Text
-  createdAt DateTime @default(now())
+  role           MessageRole
+  content        String      @db.Text
+  contentType    String      @default("text")
+  imagePath      String?
+  createdAt      DateTime    @default(now())
 
-  conversation Conversation @relation(fields: [conversationId], references:[id], onDelete: Cascade)
+  conversation       Conversation        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  messageAttachments MessageAttachment[]
 }
 
-enum MessageRole{
+model MessageAttachment {
+  id Int @id @default(autoincrement())
+
+  messageId Int
+
+  filePath String
+
+  mimeType String
+
+  message Message @relation(fields: [messageId], references: [id])
+}
+
+enum MessageRole {
   USER
   ASSISTANT
 }

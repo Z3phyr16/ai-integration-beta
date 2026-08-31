@@ -125,9 +125,11 @@ export const sendMessage = async (req: Request, res: Response) => {
       Number(conversationId),
       content,
       imageAnalysis,
+      req.file?.filename || "",
     );
     res.json({
-      response,
+      content: response,
+      contentType: imageAnalysis ? "razor" : "",
     });
   } catch (error: any) {
     const message = error?.message ?? "Unknown error";

@@ -40,6 +40,7 @@ export const chatApi = {
       `/api/chat/conversations/${conversationId}/messages`,
       formData
     )
+    console.log(response)
     return response.data
   },
 
