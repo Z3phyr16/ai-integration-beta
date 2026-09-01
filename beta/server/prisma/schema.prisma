@@ -44,6 +44,22 @@ model MessageAttachment {
   message Message @relation(fields: [messageId], references: [id])
 }
 
+model ComponentKnowledge {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  category String
+
+  description String @db.Text
+
+  example String @db.Text
+
+  embedding Unsupported("vector(3072)")
+
+  createdAt DateTime @default(now())
+}
+
 enum MessageRole {
   USER
   ASSISTANT

@@ -1,24 +1,34 @@
-import { componentCatalog } from "../knowledge/component-catalog.js";
-
 import type { DetectedControl, MappedControl } from "../knowledge/types.js";
 
-export const mapControlsToComponents = (
+import { findBestComponent } from "./rag.service.js";
+
+export const mapControlsToComponents = async (
   controls: DetectedControl[],
-): MappedControl[] => {
-  return controls.map((control) => {
-    const normalizedType = control.type === "textbox" ? "input" : control.type;
+): Promise<MappedControl[]> => {
+  const mapped: MappedControl[] = [];
 
-    const component = componentCatalog.find(
-      (c) => c.category === normalizedType,
-    );
+  for (const control of controls) {
+    const component = await findBestComponent(`
+Type: ${control.type}
+Label: ${control.label}
+Placeholder: ${control.placeholder ?? ""}
+`);
 
-    return {
+    if (!component) {
+      continue;
+    }
+
+    mapped.push({
       label: control.label,
-      component: component?.name ?? "Unknown",
-      example: component?.example || "",
+      component: component.name,
+      example: component.example,
       row: control.row,
       column: control.column,
-      placeholder: control.placeholder || "",
-    };
-  });
+      ...(control.placeholder && {
+        placeholder: control.placeholder,
+      }),
+    });
+  }
+
+  return mapped;
 };
