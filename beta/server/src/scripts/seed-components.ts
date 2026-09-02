@@ -5,23 +5,24 @@ const components = [
   {
     name: "CustomInput",
     category: "input",
-    description:
-      "Standard text input component used for names, titles and free text values.",
+    hasInternalLabel: true,
+    description: "...",
     example: `
 <CustomInput
- Label="Employee Name"
+ Label="{{label}}"
+ Placeholder="{{placeholder}}"
 />
 `,
   },
 
   {
     name: "AtomDate",
-    category: "date picker",
-    description:
-      "Standard date selection component used for capturing specific dates like birthdays, deadlines, or historical events.",
+    category: "date",
+    hasInternalLabel: false,
+    description: "...",
     example: `
 <AtomDate
- Label="Date of Birth"
+ Label="{{label}}"
 />
 `,
   },
@@ -29,9 +30,12 @@ const components = [
   {
     name: "AtomComboBox",
     category: "dropdown",
-    description: "Dropdown selection component.",
+    hasInternalLabel: false,
+    description: "...",
     example: `
-<AtomComboBox />
+<AtomComboBox
+ Placeholder="{{placeholder}}"
+/>
 `,
   },
 ];
@@ -47,23 +51,25 @@ ${component.example}
 `);
 
     await prisma.$executeRawUnsafe(`
-      INSERT INTO "ComponentKnowledge"
-      (
-        name,
-        category,
-        description,
-        example,
-        embedding
-      )
-      VALUES
-      (
-        '${component.name}',
-        '${component.category}',
-        '${component.description.replace(/'/g, "''")}',
-        '${component.example.replace(/'/g, "''")}',
-        '[${embedding.join(",")}]'
-      )
-    `);
+  INSERT INTO "ComponentKnowledge"
+  (
+    name,
+    category,
+    description,
+    example,
+    "hasInternalLabel",
+    embedding
+  )
+  VALUES
+  (
+    '${component.name}',
+    '${component.category}',
+    '${component.description.replace(/'/g, "''")}',
+    '${component.example.replace(/'/g, "''")}',
+    ${component.hasInternalLabel},
+    '[${embedding.join(",")}]'
+  )
+`);
 
     console.log(`Inserted ${component.name}`);
   }

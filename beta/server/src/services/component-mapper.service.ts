@@ -8,11 +8,18 @@ export const mapControlsToComponents = async (
   const mapped: MappedControl[] = [];
 
   for (const control of controls) {
-    const component = await findBestComponent(`
-Type: ${control.type}
+    const matches = await findBestComponent(`
+Control Type: ${control.type}
+
 Label: ${control.label}
+
 Placeholder: ${control.placeholder ?? ""}
+
+This control appears in a business form.
+Choose the most appropriate Blazor component.
 `);
+
+    const component = matches[0];
 
     if (!component) {
       continue;
@@ -22,6 +29,7 @@ Placeholder: ${control.placeholder ?? ""}
       label: control.label,
       component: component.name,
       example: component.example,
+      hasInternalLabel: component.hasInternalLabel,
       row: control.row,
       column: control.column,
       ...(control.placeholder && {

@@ -115,9 +115,19 @@ export const sendMessage = async (req: Request, res: Response) => {
 
       const detected = await visionService.analyzeUiImage(base64, mimeType);
 
-      const mapped = mapControlsToComponents(detected);
+      const mapped = await mapControlsToComponents(detected);
 
       const razor = generateRazor(mapped);
+
+      console.log("Detected:");
+      console.log(JSON.stringify(detected, null, 2));
+
+      console.log("Mapped:");
+      console.log(JSON.stringify(mapped, null, 2));
+
+      console.log("Razor:");
+      console.log(razor);
+
       imageAnalysis = razor;
     }
 

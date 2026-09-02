@@ -55,6 +55,8 @@ model ComponentKnowledge {
 
   example String @db.Text
 
+  hasInternalLabel Boolean @default(false)
+
   embedding Unsupported("vector(3072)")
 
   createdAt DateTime @default(now())

@@ -18,6 +18,7 @@ export interface MappedControl {
   component: string;
   label: string;
   example?: string;
+  hasInternalLabel?: boolean;
   placeholder?: string;
   row: number;
   column: number;

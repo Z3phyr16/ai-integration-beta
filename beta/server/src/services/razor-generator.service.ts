@@ -1,25 +1,13 @@
 import type { MappedControl } from "../knowledge/types.js";
 
-const generateControl = (control: MappedControl): string => {
-  switch (control.component) {
-    case "CustomInput":
-      return `
-<CustomInput
-    Label="${control.label}"
-    Placeholder="${control.placeholder ?? `Enter ${control.label}`}" />
-`;
-
-    case "AtomComboBox":
-      return `
-<AtomComboBox
-    Placeholder="${control.placeholder ?? `Select ${control.label}`}" />
-`;
-
-    default:
-      return `
-<!-- Unknown Component: ${control.label} -->
-`;
+const renderTemplate = (control: MappedControl): string => {
+  if (!control.example) {
+    return `<!-- Missing template for ${control.component} -->`;
   }
+
+  return control.example
+    .replaceAll("{{label}}", control.label)
+    .replaceAll("{{placeholder}}", control.placeholder ?? "");
 };
 
 export const generateRazor = (controls: MappedControl[]): string => {
@@ -27,7 +15,6 @@ export const generateRazor = (controls: MappedControl[]): string => {
 
   const rows = new Map<number, MappedControl[]>();
 
-  // Group controls by row
   controls.forEach((control) => {
     if (!rows.has(control.row)) {
       rows.set(control.row, []);
@@ -36,9 +23,7 @@ export const generateRazor = (controls: MappedControl[]): string => {
     rows.get(control.row)?.push(control);
   });
 
-  // Generate layout
   for (const [, rowControls] of rows) {
-    // sort columns left -> right
     rowControls.sort((a, b) => a.column - b.column);
 
     const colSize = Math.floor(12 / rowControls.length);
@@ -47,8 +32,12 @@ export const generateRazor = (controls: MappedControl[]): string => {
 
     rowControls.forEach((control) => {
       razor += `    <div class="col-md-${colSize}">\n`;
-      razor += `<p class="atom-p txt-default-color">${control.label}</p>`;
-      razor += generateControl(control)
+
+      if (!control.hasInternalLabel) {
+        razor += `<p class="atom-p txt-default-color">${control.label}</p>\n`;
+      }
+
+      razor += renderTemplate(control)
         .split("\n")
         .map((line) => (line ? `        ${line}` : line))
         .join("\n");
