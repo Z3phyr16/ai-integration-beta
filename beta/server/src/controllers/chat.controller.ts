@@ -119,14 +119,14 @@ export const sendMessage = async (req: Request, res: Response) => {
 
       const razor = generateRazor(mapped);
 
-      console.log("Detected:");
-      console.log(JSON.stringify(detected, null, 2));
+      // console.log("Detected:");
+      // console.log(JSON.stringify(detected, null, 2));
 
-      console.log("Mapped:");
-      console.log(JSON.stringify(mapped, null, 2));
+      // console.log("Mapped:");
+      // console.log(JSON.stringify(mapped, null, 2));
 
-      console.log("Razor:");
-      console.log(razor);
+      // console.log("Razor:");
+      // console.log(razor);
 
       imageAnalysis = razor;
     }

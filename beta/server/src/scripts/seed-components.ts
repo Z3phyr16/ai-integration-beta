@@ -1,44 +1,7 @@
 import "dotenv/config";
 import { createEmbedding } from "../services/embedding.service.js";
 import prisma from "../prisma/client.js";
-const components = [
-  {
-    name: "CustomInput",
-    category: "input",
-    hasInternalLabel: true,
-    description: "...",
-    example: `
-<CustomInput
- Label="{{label}}"
- Placeholder="{{placeholder}}"
-/>
-`,
-  },
-
-  {
-    name: "AtomDate",
-    category: "date",
-    hasInternalLabel: false,
-    description: "...",
-    example: `
-<AtomDate
- Label="{{label}}"
-/>
-`,
-  },
-
-  {
-    name: "AtomComboBox",
-    category: "dropdown",
-    hasInternalLabel: false,
-    description: "...",
-    example: `
-<AtomComboBox
- Placeholder="{{placeholder}}"
-/>
-`,
-  },
-];
+import { components } from "../knowledge/component-knowledge-generated.js";
 
 async function main() {
   for (const component of components) {
